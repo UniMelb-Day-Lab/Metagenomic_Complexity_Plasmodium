@@ -123,6 +123,7 @@ GSmatrixToTable <- function(x){
 ```{bash}
 gunzip -1 input_files/DBS_PilotS1to8_WB_S8MRS.id96.DBLaTags_cleaned_renamed_centroids.fasta.gz
 gunzip -1 input_files/DBS_PilotS1to8_WB_S8MRS.id96.DBLaTags_cleaned_renamed_otuTable_binary.txt.gz
+unzip input_files/gadm41_GHA_shp.zip -d input_files
 ```
 
 # ***** PROCESSING

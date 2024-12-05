@@ -3184,7 +3184,7 @@ for (plotpid in setpid) {
   ## Plot prop bar plots
   plot_DBS_WB <- file_otutable_freqs_prop %>%
     ggplot(., aes(x=name, y=prop, fill=value, group=value, shape=value)) +
-    geom_bar(stat="identity", color="black") +
+    geom_bar(stat="identity") +
     theme_bw() +
     scale_fill_nejm(name="") +
     scale_x_discrete(name="Volume") +

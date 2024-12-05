@@ -3181,14 +3181,12 @@ for (plotpid in setpid) {
     mutate(name=factor(name, levels=WBvol_list)) %>%
     mutate(value=factor(value, levels=c("DBS & pRBC", "pRBC only", "DBS only")))
   
-  ## Plot line plots
+  ## Plot prop bar plots
   plot_DBS_WB <- file_otutable_freqs_prop %>%
-    ggplot(., aes(x=name, y=prop, color=value, group=value, shape=value)) +
-    geom_line() +
-    geom_point(size=4) +
+    ggplot(., aes(x=name, y=prop, fill=value, group=value, shape=value)) +
+    geom_bar(stat="identity", color="black") +
     theme_bw() +
-    scale_color_nejm(name="") +
-    scale_shape_manual(name="", values=c(15,16,17,18)) +
+    scale_fill_nejm(name="") +
     scale_x_discrete(name="Volume") +
     scale_y_continuous(name=expression(paste("Proportion of DBL", alpha, " types", sep="")), breaks=scales::pretty_breaks(), limits=c(0,1)) +
     theme(legend.position="right",
@@ -3199,10 +3197,10 @@ for (plotpid in setpid) {
   
   ##### Save output
   ## Save files in RDS format
-  saveRDS(plot_DBS_WB, paste0("Z04.POPULATION.out_RDS/0", PART, ".id", plotpid, ".FIELD_POP.DBS_WB_propDBLa.LINES.PLOT.rds"))
+  saveRDS(plot_DBS_WB, paste0("Z04.POPULATION.out_RDS/0", PART, ".id", plotpid, ".FIELD_POP.DBS_WB_propDBLa.BAR.PLOT.rds"))
   
   ## Save files in TIFF format
-  ggsave(paste0("Z04.POPULATION.out_RESULTS/0", PART, ".id", plotpid, ".FIELD_POP.DBS_WB_propDBLa.LINE.tiff"),
+  ggsave(paste0("Z04.POPULATION.out_RESULTS/0", PART, ".id", plotpid, ".FIELD_POP.DBS_WB_propDBLa.BAR.tiff"),
          plot_DBS_WB,
          device="tiff", dpi=300,
          width=8, height=5)

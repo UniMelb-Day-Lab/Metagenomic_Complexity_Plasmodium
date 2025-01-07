@@ -732,14 +732,14 @@ for (plotpid in setpid) {
   for (agegrp in c("All", AgeGroups_list)) {
     for (sp in c("Pf", "Pm", "Po")) {
       if (agegrp == "All") {
-        fet_tmp <- file_isolates_field_species_binary %>% filter(species==sp) %>% select(!c(Isolate, AgeGrp, species)) %>% table() %>% fisher.test(.)
+        fet_tmp <- file_isolates_field_species_binary %>% filter(species==sp) %>% select(!c(Isolate, AgeGrp, species)) %>% table() %>% fisher.test(., alternative="two.sided")
       } else {
         fet_tmp <- file_isolates_field_species_binary %>% filter(species==sp & AgeGrp==agegrp) %>% select(!c(Isolate, AgeGrp, species))
         # Set factors to include zeroes
         DBS_levels <- unique(fet_tmp$WB100[!is.na(fet_tmp$WB100)])
         WB100_levels <- unique(fet_tmp$WB100[!is.na(fet_tmp$WB100)])
         
-        fet_tmp <- table(factor(fet_tmp$DBS, levels=DBS_levels), factor(fet_tmp$WB100, levels=WB100_levels)) %>% fisher.test(.)
+        fet_tmp <- table(factor(fet_tmp$DBS, levels=DBS_levels), factor(fet_tmp$WB100, levels=WB100_levels)) %>% fisher.test(., alternative="two.sided")
       }
       pval <- data.frame(sp, agegrp, pval=fet_tmp$p.value) %>%
         mutate(sig=case_when(pval > 0.05 ~ "ns",
@@ -1097,19 +1097,19 @@ for (plotpid in setpid) {
     unique()
   
   ## test sex (Mann Whitney U)
-  stats_sex <- wilcox.test(sum_complexity ~ sex_ML, data = file_isolates_MOI_100, exact = FALSE)
+  stats_sex <- wilcox.test(sum_complexity ~ sex_ML, data = file_isolates_MOI_100, exact = FALSE, alternative="two.sided")
   
   ## test village (Mann Whitney U)
-  stats_village <- wilcox.test(sum_complexity ~ village_ML, data = file_isolates_MOI_100, exact = FALSE)
+  stats_village <- wilcox.test(sum_complexity ~ village_ML, data = file_isolates_MOI_100, exact = FALSE, alternative="two.sided")
   
   ## test hgb (Spearman's)
-  stats_hgb <- cor.test(x=file_isolates_MOI_100$hgb, y=file_isolates_MOI_100$sum_complexity, method = 'spearman', exact=FALSE)
+  stats_hgb <- cor.test(x=file_isolates_MOI_100$hgb, y=file_isolates_MOI_100$sum_complexity, method = 'spearman', exact=FALSE, alternative="two.sided")
   
   ## test age (Spearman's)
-  stats_age <- cor.test(x=file_isolates_MOI_100$age, y=file_isolates_MOI_100$sum_complexity, method = 'spearman', exact=FALSE)
+  stats_age2 <- cor.test(x=file_isolates_MOI_100$age, y=file_isolates_MOI_100$sum_complexity, method = 'spearman', exact=FALSE, alternative="two.sided")
   
   ## test temp (Spearman's)
-  stats_temp <- cor.test(x=as.numeric(file_isolates_MOI_100$temp), y=file_isolates_MOI_100$sum_complexity, method = 'spearman', exact=FALSE)
+  stats_temp <- cor.test(x=as.numeric(file_isolates_MOI_100$temp), y=file_isolates_MOI_100$sum_complexity, method = 'spearman', exact=FALSE, alternative="two.sided")
   
   ## test occup (Kruskal-Wallis)
   stats_occup <- kruskal.test(sum_complexity ~ occup, data=file_isolates_MOI_100)
@@ -1122,13 +1122,13 @@ for (plotpid in setpid) {
     mutate(complexity=ifelse(sum_complexity >= 10, "high", "low")) %>%
     select(complexity, sex_ML) %>%
     table() %>%
-    fisher.test(.)
+    fisher.test(., alternative="two.sided")
   
   stats_sex_EXTREME_minMOI9 <- file_isolates_MOI_100 %>%
     mutate(complexity=ifelse(sum_complexity >= 9, "high", "low")) %>%
     select(complexity, sex_ML) %>%
     table() %>%
-    fisher.test(.)
+    fisher.test(., alternative="two.sided")
   
   ## Combine stats
   stats_complexity <- data.frame()
@@ -1346,6 +1346,10 @@ for (plotpid in setpid) {
     file_isolates_field_metric <- file_isolates_field %>%
       filter(metric == pw_metric)
     
+    ## Shapiro test for normality
+    shapiro_norm <- file_isolates_field_metric %>%
+      shapiro_test(value)
+    
     ## Statistical test (Friedman test)
     friedman_nstats <- file_isolates_field_metric %>%
       friedman_test(value ~ WBvol | Isolate)
@@ -1355,6 +1359,7 @@ for (plotpid in setpid) {
       pairwise_wilcox_test(value ~ WBvol,
                            paired=TRUE,
                            p.adjust.method="holm",
+                           alternative="two.sided",
                            comparisons=list(c("1uL", "10uL"), c("1uL", "50uL"), c("1uL", "100uL"),
                                             c("10uL", "50uL"), c("10uL", "100uL"), c("50uL", "100uL"))) %>% 
       add_xy_position(x = "WBvol", step.increase=0.05) %>%
